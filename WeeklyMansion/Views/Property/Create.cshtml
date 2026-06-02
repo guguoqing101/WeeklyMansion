@@ -1,0 +1,23 @@
+﻿@model WeeklyMansion.Models.Property
+
+<h2>物件登録</h2>
+
+<form asp-action="Create" method="post">
+
+    <div>
+        <label>物件名</label>
+        <input asp-for="PropertyName" />
+    </div>
+
+    <div>
+        <label>住所</label>
+        <input asp-for="Address" />
+    </div>
+
+    <br />
+
+    <button type="submit">
+        登録
+    </button>
+
+</form>

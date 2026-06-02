@@ -1,0 +1,42 @@
+﻿@model WeeklyMansion.Models.Property
+
+<h2>物件編集</h2>
+
+<form asp-action="Edit" method="post">
+
+    <input type="hidden"
+           asp-for="PropertyId" />
+
+    <div class="mb-3">
+
+        <label class="form-label">
+            物件名
+        </label>
+
+        <input asp-for="PropertyName"
+               class="form-control" />
+
+    </div>
+
+    <div class="mb-3">
+
+        <label class="form-label">
+            住所
+        </label>
+
+        <input asp-for="Address"
+               class="form-control" />
+
+    </div>
+
+    <button type="submit"
+            class="btn btn-primary">
+        更新
+    </button>
+
+    <a asp-action="Index"
+       class="btn btn-secondary">
+        戻る
+    </a>
+
+</form>

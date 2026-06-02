@@ -1,0 +1,46 @@
+﻿@model List<WeeklyMansion.Models.Property>
+
+<div class="container mt-4">
+
+    <h2>物件一覧</h2>
+
+    <a asp-action="Create"
+       class="btn btn-primary mb-3">
+        新規登録
+    </a>
+
+    <table class="table table-bordered table-striped">
+
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>物件名</th>
+                <th>住所</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.PropertyId</td>
+                    <td>@item.PropertyName</td>
+                    <td>@item.Address</td>
+
+                    <td>
+                        <a asp-action="Edit" asp-route-PropertyId="@item.PropertyId">編集</a> |
+@*                         <a asp-action="Details" asp-route-id="@item.PropertyId">詳細</a> |
+                        <a asp-action="Delete" asp-route-id="@item.PropertyId">削除</a> |
+ *@
+                        <a asp-controller="Rooms" asp-action="Index" asp-route-propertyId="@item.PropertyId">部屋管理</a>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
+
+</div>

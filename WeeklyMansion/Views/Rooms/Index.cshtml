@@ -1,0 +1,65 @@
+@model IEnumerable<WeeklyMansion.Models.Room>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create" asp-route-propertyId="@ViewBag.PropertyId">êVãKïîâÆìoò^</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.PropertyId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RoomNo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RoomName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Capacity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Property)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(model => item.PropertyId)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.RoomNo)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.RoomName)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.Capacity)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.Property)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.RoomId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.RoomId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.RoomId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
