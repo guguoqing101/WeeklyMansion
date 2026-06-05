@@ -1,0 +1,265 @@
+@{
+    ViewData["Title"] = "空室カレンダー";
+    var propertyId = ViewBag.PropertyId as int?;
+    var roomId = ViewBag.RoomId as int?;
+}
+
+<link rel="stylesheet" href="~/css/calendar.css" asp-append-version="true" />
+
+<div class="calendar-page">
+    <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
+        <div>
+            <h1 class="h3 mb-1">空室カレンダー</h1>
+            <div class="text-muted">予約、清掃、メンテナンスを部屋ごとに確認します。</div>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 align-items-end">
+            <div>
+                <label class="form-label mb-1" for="propertyFilter">物件</label>
+                <select id="propertyFilter" class="form-select" asp-items="ViewBag.Properties"></select>
+            </div>
+            <div>
+                <label class="form-label mb-1" for="roomFilter">部屋</label>
+                <select id="roomFilter" class="form-select" asp-items="ViewBag.Rooms">
+                    <option value="">全て</option>
+                </select>
+            </div>
+            <button type="button" id="reloadCalendar" class="btn btn-primary">表示更新</button>
+        </div>
+    </div>
+
+    <div class="calendar-legend mb-3">
+        <span><i class="legend-dot status-available"></i>空室</span>
+        <span><i class="legend-dot status-reserved"></i>予約済</span>
+        <span><i class="legend-dot status-cleaning"></i>清掃中</span>
+        <span><i class="legend-dot status-maintenance"></i>メンテナンス</span>
+    </div>
+
+    <div id="calendarMessage" class="alert d-none" role="alert"></div>
+    <div id="calendar"></div>
+</div>
+
+<div class="modal fade" id="dayActionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">カレンダー登録</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="selectedDate" />
+
+                <div class="mb-3">
+                    <label class="form-label" for="modalRoomId">部屋</label>
+                    <select id="modalRoomId" class="form-select"></select>
+                </div>
+
+                <ul class="nav nav-tabs mb-3" id="calendarTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="status-tab" data-bs-toggle="tab" data-bs-target="#statusPane" type="button" role="tab">日別状態</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="reservation-tab" data-bs-toggle="tab" data-bs-target="#reservationPane" type="button" role="tab">予約</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="statusPane" role="tabpanel" aria-labelledby="status-tab">
+                        <div class="mb-3">
+                            <label class="form-label" for="statusValue">状態</label>
+                            <select id="statusValue" class="form-select">
+                                <option value="0">空室</option>
+                                <option value="1">予約済</option>
+                                <option value="2">清掃中</option>
+                                <option value="3">メンテナンス</option>
+                            </select>
+                        </div>
+                        <button type="button" id="saveStatus" class="btn btn-primary">日別状態を保存</button>
+                    </div>
+
+                    <div class="tab-pane fade" id="reservationPane" role="tabpanel" aria-labelledby="reservation-tab">
+                        <div class="row g-2 mb-3">
+                            <div class="col-sm-6">
+                                <label class="form-label" for="checkInDate">チェックイン</label>
+                                <input id="checkInDate" class="form-control" type="date" />
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label" for="checkOutDate">チェックアウト</label>
+                                <input id="checkOutDate" class="form-control" type="date" />
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="customerName">顧客名</label>
+                            <input id="customerName" class="form-control" maxlength="100" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="reservationMemo">メモ</label>
+                            <textarea id="reservationMemo" class="form-control" maxlength="500" rows="3"></textarea>
+                        </div>
+                        <button type="button" id="saveReservation" class="btn btn-primary">予約を登録</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/locales-all.global.min.js"></script>
+
+    <script>
+        const calendarEl = document.getElementById('calendar');
+        const propertyFilter = document.getElementById('propertyFilter');
+        const roomFilter = document.getElementById('roomFilter');
+        const modalRoomId = document.getElementById('modalRoomId');
+        const selectedDate = document.getElementById('selectedDate');
+        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+        const modal = new bootstrap.Modal(document.getElementById('dayActionModal'));
+
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            locale: 'ja',
+            initialView: 'dayGridMonth',
+            height: 'auto',
+            selectable: true,
+            dayMaxEvents: true,
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,listMonth'
+            },
+            events: fetchEvents,
+            dateClick: function(info) {
+                selectedDate.value = info.dateStr;
+                document.getElementById('checkInDate').value = info.dateStr;
+                document.getElementById('checkOutDate').value = addDays(info.dateStr, 1);
+                fillModalRooms();
+                modal.show();
+            }
+        });
+
+        calendar.render();
+
+        document.getElementById('reloadCalendar').addEventListener('click', function() {
+            calendar.refetchEvents();
+        });
+
+        propertyFilter.addEventListener('change', async function() {
+            await reloadRooms();
+            calendar.refetchEvents();
+        });
+
+        roomFilter.addEventListener('change', function() {
+            calendar.refetchEvents();
+        });
+
+        document.getElementById('saveStatus').addEventListener('click', async function() {
+            const body = new URLSearchParams();
+            body.append('__RequestVerificationToken', token);
+            body.append('roomId', modalRoomId.value);
+            body.append('targetDate', selectedDate.value);
+            body.append('status', document.getElementById('statusValue').value);
+
+            await postForm('@Url.Action("SaveRoomStatus", "Calendar")', body);
+        });
+
+        document.getElementById('saveReservation').addEventListener('click', async function() {
+            const body = new URLSearchParams();
+            body.append('__RequestVerificationToken', token);
+            body.append('roomId', modalRoomId.value);
+            body.append('checkInDate', document.getElementById('checkInDate').value);
+            body.append('checkOutDate', document.getElementById('checkOutDate').value);
+            body.append('customerName', document.getElementById('customerName').value);
+            body.append('memo', document.getElementById('reservationMemo').value);
+
+            await postForm('@Url.Action("CreateReservation", "Calendar")', body);
+        });
+
+        function fetchEvents(info, successCallback, failureCallback) {
+            const params = new URLSearchParams();
+            params.append('start', info.startStr);
+            params.append('end', info.endStr);
+
+            if (propertyFilter.value) {
+                params.append('propertyId', propertyFilter.value);
+            }
+
+            if (roomFilter.value) {
+                params.append('roomId', roomFilter.value);
+            }
+
+            fetch('@Url.Action("Events", "Calendar")?' + params.toString())
+                .then(response => response.ok ? response.json() : Promise.reject(response))
+                .then(successCallback)
+                .catch(failureCallback);
+        }
+
+        async function reloadRooms() {
+            roomFilter.innerHTML = '<option value="">全て</option>';
+            modalRoomId.innerHTML = '';
+
+            if (!propertyFilter.value) {
+                return;
+            }
+
+            const response = await fetch('@Url.Action("Rooms", "Calendar")?propertyId=' + propertyFilter.value);
+            const rooms = await response.json();
+
+            for (const room of rooms) {
+                const text = room.roomName ? `${room.roomNo} ${room.roomName}` : room.roomNo;
+                roomFilter.add(new Option(text, room.roomId));
+                modalRoomId.add(new Option(text, room.roomId));
+            }
+        }
+
+        function fillModalRooms() {
+            modalRoomId.innerHTML = '';
+
+            const selectedRoom = roomFilter.value;
+            for (const option of roomFilter.options) {
+                if (!option.value) {
+                    continue;
+                }
+                modalRoomId.add(new Option(option.text, option.value));
+            }
+
+            if (selectedRoom) {
+                modalRoomId.value = selectedRoom;
+            }
+        }
+
+        async function postForm(url, body) {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                },
+                body: body.toString()
+            });
+
+            const result = await response.json();
+            showMessage(result.message, response.ok);
+
+            if (response.ok) {
+                calendar.refetchEvents();
+                modal.hide();
+            }
+        }
+
+        function showMessage(message, success) {
+            const messageEl = document.getElementById('calendarMessage');
+            messageEl.textContent = message;
+            messageEl.className = success ? 'alert alert-success' : 'alert alert-danger';
+        }
+
+        function addDays(dateText, days) {
+            const date = new Date(dateText + 'T00:00:00');
+            date.setDate(date.getDate() + days);
+            return date.toISOString().slice(0, 10);
+        }
+
+        fillModalRooms();
+    </script>
+}

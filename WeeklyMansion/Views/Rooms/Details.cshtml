@@ -4,56 +4,45 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<h1>•”‰®Ú×</h1>
 
 <div>
     <h4>Room</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PropertyId)
+            •¨ŒID
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.PropertyId)
         </dd>
-    </dl>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.RoomNo)
+            •”‰®No
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.RoomNo)
         </dd>
-    </dl>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.RoomName)
+            •”‰®–¼
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.RoomName)
         </dd>
-    </dl>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Capacity)
+            ’èˆõ
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Capacity)
         </dd>
-    </dl>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
+            —˜—pó‘Ô
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Property)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Property)
+            @Model.IsActiveName
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.RoomId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model?.RoomId">•ÒW</a> |
+    <a asp-action="Index" asp-route-propertyId="@Model?.PropertyId">Back to List</a>
 </div>

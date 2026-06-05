@@ -1,0 +1,43 @@
+.calendar-page {
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+#calendar {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 12px;
+}
+
+.calendar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+.legend-dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: -1px;
+}
+
+.status-available {
+    background: #16a34a;
+}
+
+.status-reserved {
+    background: #2563eb;
+}
+
+.status-cleaning {
+    background: #ca8a04;
+}
+
+.status-maintenance {
+    background: #dc2626;
+}

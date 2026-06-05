@@ -4,59 +4,55 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
+<h1>部屋新規作成</h1>
 
-<h4>Room</h4>
+<h4>部屋データ</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-@*             <div class="form-group">
-                <label asp-for="PropertyId" class="control-label"></label>
-                <input asp-for="PropertyId" class="form-control" />
-                <span asp-validation-for="PropertyId" class="text-danger"></span>
-            </div>
- *@
             <input type="hidden" asp-for="PropertyId" />
 
             <div class="form-group">
-                <label asp-for="RoomNo" class="control-label"></label>
+                部屋No
                 <input asp-for="RoomNo" class="form-control" />
                 <span asp-validation-for="RoomNo" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="RoomName" class="control-label"></label>
+                部屋名
                 <input asp-for="RoomName" class="form-control" />
                 <span asp-validation-for="RoomName" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="Capacity" class="control-label"></label>
-                <input asp-for="Capacity" class="form-control" />
+                定員
+                <input asp-for="Capacity" class="form-control" type="number" min="1" max="10" />
                 <span asp-validation-for="Capacity" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <input asp-for="Status" class="form-control" />
-                <span asp-validation-for="Status" class="text-danger"></span>
+                利用状態
+                <select asp-for="IsActive" class="form-select">
+                    <option value="true">利用可能</option>
+                    <option value="false">利用停止</option>
+                </select>
+                <span asp-validation-for="IsActive" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="Property" class="control-label"></label>
-                <input asp-for="Property" class="form-control" />
-                <span asp-validation-for="Property" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="登録" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index" asp-route-propertyId="@Model.PropertyId">Back to List</a>
 </div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

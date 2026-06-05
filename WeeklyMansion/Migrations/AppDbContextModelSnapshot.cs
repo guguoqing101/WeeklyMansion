@@ -17,7 +17,7 @@ namespace WeeklyMansion.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.0")
+                .HasAnnotation("ProductVersion", "8.0.27")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
@@ -43,6 +43,39 @@ namespace WeeklyMansion.Migrations
                     b.ToTable("Properties");
                 });
 
+            modelBuilder.Entity("WeeklyMansion.Models.Reservation", b =>
+                {
+                    b.Property<long>("ReservationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long>("ReservationId"));
+
+                    b.Property<DateTime>("CheckInDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("CheckOutDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("CustomerName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("Memo")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<int>("RoomId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ReservationId");
+
+                    b.HasIndex("RoomId");
+
+                    b.ToTable("Reservations");
+                });
+
             modelBuilder.Entity("WeeklyMansion.Models.Room", b =>
                 {
                     b.Property<int>("RoomId")
@@ -51,14 +84,28 @@ namespace WeeklyMansion.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("RoomId"));
 
+                    b.Property<int>("Capacity")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<int>("PropertyId")
                         .HasColumnType("int");
 
                     b.Property<string>("RoomName")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("RoomNo")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
 
                     b.HasKey("RoomId");
+
+                    b.HasIndex("PropertyId", "RoomNo")
+                        .IsUnique();
 
                     b.ToTable("Rooms");
                 });
@@ -82,7 +129,55 @@ namespace WeeklyMansion.Migrations
 
                     b.HasKey("RoomStatusId");
 
+                    b.HasIndex("RoomId", "TargetDate")
+                        .IsUnique();
+
                     b.ToTable("RoomStatuses");
+                });
+
+            modelBuilder.Entity("WeeklyMansion.Models.Reservation", b =>
+                {
+                    b.HasOne("WeeklyMansion.Models.Room", "Room")
+                        .WithMany("Reservations")
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Room");
+                });
+
+            modelBuilder.Entity("WeeklyMansion.Models.Room", b =>
+                {
+                    b.HasOne("WeeklyMansion.Models.Property", "Property")
+                        .WithMany("Rooms")
+                        .HasForeignKey("PropertyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Property");
+                });
+
+            modelBuilder.Entity("WeeklyMansion.Models.RoomStatus", b =>
+                {
+                    b.HasOne("WeeklyMansion.Models.Room", "Room")
+                        .WithMany("RoomStatuses")
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Room");
+                });
+
+            modelBuilder.Entity("WeeklyMansion.Models.Property", b =>
+                {
+                    b.Navigation("Rooms");
+                });
+
+            modelBuilder.Entity("WeeklyMansion.Models.Room", b =>
+                {
+                    b.Navigation("Reservations");
+
+                    b.Navigation("RoomStatuses");
                 });
 #pragma warning restore 612, 618
         }

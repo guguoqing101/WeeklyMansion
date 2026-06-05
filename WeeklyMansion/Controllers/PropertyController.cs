@@ -39,6 +39,18 @@ namespace WeeklyMansion.Controllers
             return View(property);
         }
 
+        public IActionResult Details(int id)
+        {
+            var property = _context.Properties.Find(id);
+
+            if (property == null)
+            {
+                return NotFound();
+            }
+
+            return View(property);
+        }
+
         public IActionResult Delete(int id)
         {
             var property = _context.Properties.Find(id);
@@ -48,11 +60,7 @@ namespace WeeklyMansion.Controllers
                 return NotFound();
             }
 
-            _context.Properties.Remove(property);
-
-            _context.SaveChanges();
-
-            return RedirectToAction(nameof(Index));
+            return View(property);
         }
 
         [HttpPost]
@@ -75,6 +83,30 @@ namespace WeeklyMansion.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int PropertyId)
+        {
+            var property = _context.Properties.Find(PropertyId);
+
+            if (property == null)
+            {
+                return NotFound();
+            }
+
+            var hasRooms = _context.Rooms.Any(r => r.PropertyId == PropertyId);
+
+            if (hasRooms)
+            {
+                ModelState.AddModelError("", "この物件には部屋データが登録されているため削除できません。");
+                return View(property);
+            }
+
+            _context.Properties.Remove(property);
+            _context.SaveChanges();
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 
 }

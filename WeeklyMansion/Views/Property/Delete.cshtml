@@ -1,0 +1,39 @@
+﻿@model WeeklyMansion.Models.Property
+
+<h2>物件削除</h2>
+
+<h4>この物件を削除してもよろしいですか？</h4>
+
+<div asp-validation-summary="ModelOnly"
+     class="text-danger">
+</div>
+
+<table class="table table-bordered">
+    <tr>
+        <th>ID</th>
+        <td>@Model.PropertyId</td>
+    </tr>
+    <tr>
+        <th>物件名</th>
+        <td>@Model.PropertyName</td>
+    </tr>
+    <tr>
+        <th>住所</th>
+        <td>@Model.Address</td>
+    </tr>
+</table>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden"
+           asp-for="PropertyId" />
+
+    <button type="submit"
+            class="btn btn-danger">
+        削除
+    </button>
+
+    <a asp-action="Index"
+       class="btn btn-secondary">
+        戻る
+    </a>
+</form>

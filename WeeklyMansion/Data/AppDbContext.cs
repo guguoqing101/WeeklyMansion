@@ -19,5 +19,21 @@ namespace WeeklyMansion.Data
 
         public DbSet<RoomStatus> RoomStatuses
             => Set<RoomStatus>();
+
+        public DbSet<Reservation> Reservations
+            => Set<Reservation>();
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Room>()
+                .HasIndex(x => new { x.PropertyId, x.RoomNo })
+                .IsUnique();
+
+            modelBuilder.Entity<RoomStatus>()
+                .HasIndex(x => new { x.RoomId, x.TargetDate })
+                .IsUnique();
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }

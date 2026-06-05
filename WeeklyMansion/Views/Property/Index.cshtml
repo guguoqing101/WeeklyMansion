@@ -30,10 +30,10 @@
                     <td>@item.Address</td>
 
                     <td>
-                        <a asp-action="Edit" asp-route-PropertyId="@item.PropertyId">編集</a> |
-@*                         <a asp-action="Details" asp-route-id="@item.PropertyId">詳細</a> |
-                        <a asp-action="Delete" asp-route-id="@item.PropertyId">削除</a> |
- *@
+                        <a asp-action="Edit"    asp-route-id="@item.PropertyId">編集</a> |
+                        <a asp-action="Details" asp-route-id="@item.PropertyId">詳細</a> |
+                        <a asp-action="Delete"  asp-route-id="@item.PropertyId">削除</a> |
+
                         <a asp-controller="Rooms" asp-action="Index" asp-route-propertyId="@item.PropertyId">部屋管理</a>
                     </td>
                 </tr>
